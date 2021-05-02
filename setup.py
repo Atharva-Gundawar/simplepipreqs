@@ -21,7 +21,7 @@ REQUIRES_PYTHON = '>=3.6.0'
 VERSION = '0.0.1'
 
 REQUIRED = [
-"pathlib","subprocess","yarg","requests","argparse"
+"pathlib","yarg","requests","argparse"
 ]
 
 
