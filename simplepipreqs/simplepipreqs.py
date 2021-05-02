@@ -1,19 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-import os
 
-"""simplepipreqs - Generate pip requirements.txt file based on imports
-Usage:
-    simplepipreqs [version] [<path>]
-Arguments:
-    <path>                The path to the directory containing the application
-                          files for which a requirements file should be
-                          generated (defaults to the current working
-                          directory).
-    
-    version         The pip version used to generate the requirements.txt file.
-                          Default will be pip
 
-"""
 from pathlib import Path
 import subprocess
 from yarg import json2package
