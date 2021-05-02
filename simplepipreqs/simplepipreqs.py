@@ -68,12 +68,15 @@ def init(args):
         else:
             print("{} not found locally, Searching online".format(mod))
             output_text.append(get_imports_info(mod))
+    print('Genrating requirements.txt ... ')
     if args['path']:    
         with open( args['path'] + "/requirements.txt", 'w') as f:
             f.write("\n".join(map(str, list(set(output_text)))))
+            print("Successfuly created/updated requirements.txt")
     else:
         with open("requirements.txt", 'w') as f:
             f.write("\n".join(map(str, list(set(output_text)))))
+            print("Successfuly created/updated requirements.txt")
 def main():  
     ap = argparse.ArgumentParser()
     ap.add_argument("-v", "--version",type=str,help="Pip version")
