@@ -68,14 +68,16 @@ def init(args):
         else:
             print("{} not found locally, Searching online".format(mod))
             output_text.append(get_imports_info(mod))
-
-    with open("requirements.txt", 'w') as f:
-        f.write("\n".join(map(str, list(set(output_text)))))
-
+    if args['path']:    
+        with open( args['path'] + "/requirements.txt", 'w') as f:
+            f.write("\n".join(map(str, list(set(output_text)))))
+    else:
+        with open("requirements.txt", 'w') as f:
+            f.write("\n".join(map(str, list(set(output_text)))))
 def main():  
     ap = argparse.ArgumentParser()
-    ap.add_argument("-v", "--version",type=str,help="pip version")
-    ap.add_argument("-p", "--path", type=str,help="path to target directory")
+    ap.add_argument("-v", "--version",type=str,help="Pip version")
+    ap.add_argument("-p", "--path", type=str,help="Path to target directory")
     args = vars(ap.parse_args())
     try:
         init(args)
