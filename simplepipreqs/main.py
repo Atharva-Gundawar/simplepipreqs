@@ -3,14 +3,14 @@
 
 """simplepipreqs - Generate pip requirements.txt file based on imports
 Usage:
-    simplepipreqs [<pip_version>] [<path>]
+    simplepipreqs [version] [<path>]
 Arguments:
     <path>                The path to the directory containing the application
                           files for which a requirements file should be
                           generated (defaults to the current working
                           directory).
     
-    <pip_version>         The pip version used to generate the requirements.txt file.
+    version         The pip version used to generate the requirements.txt file.
                           Default will be pip
 
 """
@@ -19,16 +19,14 @@ import subprocess
 from yarg import json2package
 from yarg.exceptions import HTTPError
 import requests
-import docopt
+import argparse
+import os,sys
+
 try:
     from pip._internal.operations import freeze
 except ImportError:  # pip < 10.0
     from pip.operations import freeze
 
-modules = []
-installed_with_versions = []
-installed = []
-req_text = []
 
 def get_installed_packages(pip_version="pip"):
     installed_with_versions = []
@@ -71,24 +69,27 @@ def get_project_imports(directory = os.curdir):
                                 print('found {} in {}'.format(module,name))
     return modules
 
+def init(args):
+    output_text = []
+    modules = get_project_imports() if args['path'] is None else get_project_imports(args['path'])
+    installed_with_versions,installed = get_installed_packages("pip3") if args['version'] is None else get_installed_packages(args['version'])
 
-modules = get_project_imports()
-installed_with_versions,installed = get_installed_packages("pip3")
+    for mod in modules:
+        if mod in installed:
+            print("Searching {} locally".format(mod))
+            output_text.append(installed_with_versions[installed.index(mod)])
+        else:
+            print("{} not found locally, Searching online".format(mod))
+            output_text.append(get_imports_info(mod))
 
-for mod in modules:
-    if mod in installed:
-        print("Searching {} locally".format(mod))
-        req_text.append(installed_with_versions[installed.index(mod)])
-    else:
-        print("{} not found locally, Searching online".format(mod))
-        req_text.append(get_imports_info(mod))
+    with open("requirements.txt", 'w') as f:
+        f.write("\n".join(map(str, list(set(output_text)))))
 
-with open("requirement.txt", 'w') as f:
-    f.write("\n".join(map(str, list(set(req_text)))))
-
-def main():  # pragma: no cover
-    args = docopt(__doc__, version=__version__)
-    
+def main():  
+    ap = argparse.ArgumentParser()
+    ap.add_argument("-v", "--version",type=str,help="pip version")
+    ap.add_argument("-p", "--path", type=str,help="path to target directory")
+    args = vars(ap.parse_args())
     try:
         init(args)
     except KeyboardInterrupt:
