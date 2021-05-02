@@ -1,9 +1,25 @@
-import os
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-import os
+
+"""simplepipreqs - Generate pip requirements.txt file based on imports
+Usage:
+    simplepipreqs [<pip_version>] [<path>]
+Arguments:
+    <path>                The path to the directory containing the application
+                          files for which a requirements file should be
+                          generated (defaults to the current working
+                          directory).
+    
+    <pip_version>         The pip version used to generate the requirements.txt file.
+                          Default will be pip
+
+"""
 from pathlib import Path
 import subprocess
 from yarg import json2package
 from yarg.exceptions import HTTPError
 import requests
+import docopt
 try:
     from pip._internal.operations import freeze
 except ImportError:  # pip < 10.0
@@ -70,3 +86,13 @@ for mod in modules:
 with open("requirement.txt", 'w') as f:
     f.write("\n".join(map(str, list(set(req_text)))))
 
+def main():  # pragma: no cover
+    args = docopt(__doc__, version=__version__)
+    
+    try:
+        init(args)
+    except KeyboardInterrupt:
+        sys.exit(0)
+
+if __name__ == '__main__':
+    main()
