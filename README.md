@@ -1,6 +1,6 @@
 # simplepipreqs
 
-Python module to generate requirement.txt for a given project
+Python module to generate requirement.txt for a given python / Ipython project
 
 ## Usage
 <br />
