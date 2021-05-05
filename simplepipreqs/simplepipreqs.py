@@ -74,7 +74,6 @@ def init(args):
     output_text = []
     modules = get_project_imports() if args['path'] is None else get_project_imports(args['path'])
     installed_with_versions,installed = get_installed_packages("pip3") if args['version'] is None else get_installed_packages(args['version'])
-
     for mod in modules:
         if mod in installed:
             print("Searching {} locally".format(mod))
