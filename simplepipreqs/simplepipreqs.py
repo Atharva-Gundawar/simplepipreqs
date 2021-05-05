@@ -38,7 +38,7 @@ def get_imports_info(module, pypi_server="https://pypi.python.org/pypi/", proxy=
             raise HTTPError(status_code=response.status_code,
                             reason=response.reason)
     except HTTPError:
-        return "# " + str(module) + " version not found"
+        return None
     return str(module) + '==' + str(data.latest_release_id)
 
 def get_project_imports(directory = os.curdir):
@@ -46,17 +46,21 @@ def get_project_imports(directory = os.curdir):
     for path, subdirs, files in os.walk(directory):
         for name in files:
             if name.endswith('.py'):
-                contents = Path(os.path.join(path, name)).read_text().split('\n')
+                print(path)
+                with open(os.path.join(path, name)) as f:
+                    contents = f.readlines()
+                # contents = Path(os.path.join(path, name)).absolute().read_text().split('\n')
                 for lines in contents:
                     words = lines.split(' ')
                     if 'import' == words[0] or 'from' == words[0]:
                         line_module = words[1].split('.')[0].split(',')
                         for module in line_module:
+                            module = module.split('\n')[0]
                             if module and module not in modules:
                                 modules.append(module)
                                 print('found {} in {}'.format(module,name))
             elif name.endswith('.ipynb'):
-                contents = json.loads(Path(os.path.join(path, name)).read_text())
+                contents = json.loads(Path(os.path.join(path, name)).absolute().read_text())
                 for cell in contents["cells"]:
                     for line in cell["source"]:
                         words = line.split(' ')
@@ -80,7 +84,9 @@ def init(args):
             output_text.append(installed_with_versions[installed.index(mod)])
         else:
             print("{} not found locally, Searching online".format(mod))
-            output_text.append(get_imports_info(mod))
+            mod_info = get_imports_info(mod)
+            if mod_info:
+                output_text.append(mod_info)
     print('Genrating requirements.txt ... ')
     if args['path']:    
         with open( args['path'] + "/requirements.txt", 'w') as f:

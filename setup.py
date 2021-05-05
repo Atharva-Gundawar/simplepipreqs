@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Note: To use the 'upload' functionality of this file, you must:
-#   $ pipenv install twine --dev
-
 import io
 import os
 import sys
@@ -18,7 +15,7 @@ URL = 'https://github.com/Atharva-Gundawar/simplepipreqs'
 EMAIL = 'atharva.n.gundawar@gmail.com'
 AUTHOR = 'Atharva Gundawar'
 REQUIRES_PYTHON = '>=3.6.0'
-VERSION = '0.0.1'
+VERSION = '0.0.3'
 
 REQUIRED = [
 "pathlib","yarg","requests","argparse"
@@ -50,8 +47,15 @@ setup(
     ],
     package_dir={'simplepipreqs':
                  'simplepipreqs'},
+    entry_points ={
+            'console_scripts': [
+                'simplepipreqs = simplepipreqs.simplepipreqs:main'
+            ]
+    },
     include_package_data=True,
     install_requires=REQUIRED,
+    keywords = 'Requirments Requirments.txt Requirment.txt python Ipython ipynb py',
+    zip_safe = False,
     license='MIT',
     classifiers=[
         # Trove classifiers
@@ -61,6 +65,7 @@ setup(
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: Implementation :: CPython',
-        'Programming Language :: Python :: Implementation :: PyPy'
+        'Programming Language :: Python :: Implementation :: PyPy',
+        "Operating System :: OS Independent",
     ]
 )
