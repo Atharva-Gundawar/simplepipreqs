@@ -8,6 +8,7 @@ from yarg.exceptions import HTTPError
 import requests
 import argparse
 import os,sys
+import json 
 
 try:
     from pip._internal.operations import freeze
