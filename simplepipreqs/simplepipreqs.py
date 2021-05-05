@@ -41,7 +41,7 @@ def get_imports_info(module, pypi_server="https://pypi.python.org/pypi/", proxy=
     return str(module) + '==' + str(data.latest_release_id)
 
 def get_project_imports(directory = os.curdir):
-    modules = []
+    modules =[]
     for path, subdirs, files in os.walk(directory):
         for name in files:
             if name.endswith('.py'):
@@ -51,9 +51,22 @@ def get_project_imports(directory = os.curdir):
                     if 'import' == words[0] or 'from' == words[0]:
                         line_module = words[1].split('.')[0].split(',')
                         for module in line_module:
-                            if module not in modules and module:
+                            if module and module not in modules:
                                 modules.append(module)
                                 print('found {} in {}'.format(module,name))
+            elif name.endswith('.ipynb'):
+                contents = json.loads(Path(os.path.join(path, name)).read_text())
+                for cell in contents["cells"]:
+                    for line in cell["source"]:
+                        words = line.split(' ')
+                        if 'import' == words[0] or 'from' == words[0]:
+                            line_module = words[1].split('.')[0].split(',')
+                            for module in line_module:
+                                module = module.split('\n')[0]
+                                if module and module not in modules:
+                                    modules.append(module)
+                                    print('found {} in {}'.format(module,name))
+
     return modules
 
 def init(args):
