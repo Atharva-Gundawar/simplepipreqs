@@ -49,7 +49,6 @@ def get_project_imports(directory = os.curdir):
                 print(path)
                 with open(os.path.join(path, name)) as f:
                     contents = f.readlines()
-                # contents = Path(os.path.join(path, name)).absolute().read_text().split('\n')
                 for lines in contents:
                     words = lines.split(' ')
                     if 'import' == words[0] or 'from' == words[0]:
@@ -58,7 +57,7 @@ def get_project_imports(directory = os.curdir):
                             module = module.split('\n')[0]
                             if module and module not in modules:
                                 modules.append(module)
-                                print('found {} in {}'.format(module,name))
+                                # print('found {} in {}'.format(module,name))
             elif name.endswith('.ipynb'):
                 contents = json.loads(Path(os.path.join(path, name)).absolute().read_text())
                 for cell in contents["cells"]:
@@ -70,7 +69,7 @@ def get_project_imports(directory = os.curdir):
                                 module = module.split('\n')[0]
                                 if module and module not in modules:
                                     modules.append(module)
-                                    print('found {} in {}'.format(module,name))
+                                    # print('found {} in {}'.format(module,name))
 
     return modules
 
@@ -80,10 +79,10 @@ def init(args):
     installed_with_versions,installed = get_installed_packages("pip3") if args['version'] is None else get_installed_packages(args['version'])
     for mod in modules:
         if mod in installed:
-            print("Searching {} locally".format(mod))
+            # print("Searching {} locally".format(mod))
             output_text.append(installed_with_versions[installed.index(mod)])
         else:
-            print("{} not found locally, Searching online".format(mod))
+            # print("{} not found locally, Searching online".format(mod))
             mod_info = get_imports_info(mod)
             if mod_info:
                 output_text.append(mod_info)
@@ -96,6 +95,7 @@ def init(args):
         with open("requirements.txt", 'w') as f:
             f.write("\n".join(map(str, list(set(output_text)))))
             print("Successfuly created/updated requirements.txt")
+
 def main():  
     ap = argparse.ArgumentParser()
     ap.add_argument("-v", "--version",type=str,help="Pip version")
