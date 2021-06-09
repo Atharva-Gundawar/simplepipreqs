@@ -16,7 +16,7 @@ except ImportError:  # pip < 10.0
     from pip.operations import freeze
 
 
-def get_installed_packages(pip_version="pip"):
+def get_installed_packages(pip_version:str="pip"):
     installed_with_versions = []
     installed = []
     stdout,stderr = subprocess.Popen([pip_version , "freeze"],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()
@@ -25,7 +25,7 @@ def get_installed_packages(pip_version="pip"):
         installed.append(i.decode("utf-8").split('==')[0])
     return installed_with_versions,installed
 
-def get_imports_info(module, pypi_server="https://pypi.python.org/pypi/", proxy=None):
+def get_imports_info(module:str, pypi_server:str="https://pypi.python.org/pypi/", proxy=None):
     try:
         response = requests.get(
             "{0}{1}/json".format(pypi_server, module), proxies=proxy)
@@ -41,7 +41,7 @@ def get_imports_info(module, pypi_server="https://pypi.python.org/pypi/", proxy=
         return None
     return str(module) + '==' + str(data.latest_release_id)
 
-def get_project_imports(directory = os.curdir):
+def get_project_imports(directory:str = os.curdir):
     modules =[]
     for path, subdirs, files in os.walk(directory):
         for name in files:
