@@ -10,6 +10,9 @@ import argparse
 import os
 import sys
 import json
+import threading
+import itertools
+import time
 
 try:
     from pip._internal.operations import freeze
@@ -28,7 +31,7 @@ def get_installed_packages(pip_version: str = "pip"):
     return installed_with_versions, installed
 
 
-def get_imports_info(module: str, pypi_server: str = "https://pypi.python.org/pypi/", proxy=None):
+def get_version_info(module: str, pypi_server: str = "https://pypi.python.org/pypi/", proxy=None):
     try:
         response = requests.get(
             "{0}{1}/json".format(pypi_server, module), proxies=proxy)
@@ -50,7 +53,7 @@ def get_project_imports(directory: str = os.curdir):
     for path, subdirs, files in os.walk(directory):
         for name in files:
             if name.endswith('.py'):
-                print(path)
+                # print(path)
                 with open(os.path.join(path, name)) as f:
                     contents = f.readlines()
                 for lines in contents:
@@ -63,8 +66,11 @@ def get_project_imports(directory: str = os.curdir):
                                 modules.append(module)
                                 # print('found {} in {}'.format(module,name))
             elif name.endswith('.ipynb'):
-                contents = json.loads(
-                    Path(os.path.join(path, name)).absolute().read_text())
+                with open(str(Path(os.path.join(path, name)).absolute())) as f:
+                    contents = f.readlines()
+                listToStr = ' '.join([str(elem) for elem in contents])
+                contents = json.loads(listToStr)
+                # contents = json.loads(Path(os.path.join(path, name)).absolute().read_text())
                 for cell in contents["cells"]:
                     for line in cell["source"]:
                         words = line.split(' ')
@@ -74,27 +80,61 @@ def get_project_imports(directory: str = os.curdir):
                                 module = module.split('\n')[0]
                                 if module and module not in modules:
                                     modules.append(module)
-                                    # print('found {} in {}'.format(module,name))
+                                    # print('found {} in {}'.format(module, name))
 
     return modules
 
 
 def init(args):
+
+    done_imports = False
+
+    def animate_imports():
+        for c in itertools.cycle(['|', '/', '-', '\\']):
+            if done_imports:
+
+                break
+            print('Getting imports ' + c, end="\r")
+            sys.stdout.flush()
+            time.sleep(0.1)
+
+    t_imports = threading.Thread(target=animate_imports)
+    print()
+    t_imports.start()
+
     output_text = []
     modules = get_project_imports(
     ) if args['path'] is None else get_project_imports(args['path'])
     installed_with_versions, installed = get_installed_packages(
         "pip3") if args['version'] is None else get_installed_packages(args['version'])
+
+    done_imports = True
+    time.sleep(0.2)
+    done_versions = False
+
+    def animate_versions():
+        for c in itertools.cycle(['|', '/', '-', '\\']):
+            if done_versions:
+                print("\033[A                             \033[A")
+                break
+            print('Getting versions ' + c, end="\r")
+            sys.stdout.flush()
+            time.sleep(0.1)
+
+    t_versions = threading.Thread(target=animate_versions)
+    t_versions.start()
+
     for mod in modules:
         if mod in installed:
-            # print("Searching {} locally".format(mod))
-            output_text.append(installed_with_versions[installed.index(mod)])
-        else:
-            # print("{} not found locally, Searching online".format(mod))
-            mod_info = get_imports_info(mod)
+            mod_info = get_version_info(mod)
             if mod_info:
                 output_text.append(mod_info)
-    print('Genrating requirements.txt ... ')
+
+    done_versions = True
+    time.sleep(0.2)
+
+    print('\nGenrating requirements.txt ... ')
+
     if args['path']:
         with open(args['path'] + "/requirements.txt", 'w') as f:
             f.write("\n".join(map(str, list(set(output_text)))))
@@ -103,7 +143,7 @@ def init(args):
         with open("requirements.txt", 'w') as f:
             f.write("\n".join(map(str, list(set(output_text)))))
             print("Successfuly created/updated requirements.txt")
-
+    print()
 
 def main():
     ap = argparse.ArgumentParser()
@@ -114,7 +154,6 @@ def main():
         init(args)
     except KeyboardInterrupt:
         sys.exit(0)
-
 
 if __name__ == '__main__':
     main()
