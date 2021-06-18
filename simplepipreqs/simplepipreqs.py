@@ -145,6 +145,7 @@ def init(args):
             print("Successfuly created/updated requirements.txt")
     print()
 
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("-v", "--version", type=str, help="Pip version")
@@ -154,6 +155,7 @@ def main():
         init(args)
     except KeyboardInterrupt:
         sys.exit(0)
+
 
 if __name__ == '__main__':
     main()
