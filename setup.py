@@ -10,12 +10,12 @@ from setuptools import find_packages, setup, Command
 
 # Package meta-data.
 NAME = 'simplepipreqs'
-DESCRIPTION = 'Python module to generate requirements.txt for a given project.'
+DESCRIPTION = 'Generate requirements.txt for .py and .ipynb files.'
 URL = 'https://github.com/Atharva-Gundawar/simplepipreqs'
 EMAIL = 'atharva.n.gundawar@gmail.com'
 AUTHOR = 'Atharva Gundawar'
 REQUIRES_PYTHON = '>=3.6.0'
-VERSION = '0.0.3'
+VERSION = '0.0.4'
 
 REQUIRED = [
 "pathlib","yarg","requests","argparse"
